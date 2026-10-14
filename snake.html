@@ -223,7 +223,9 @@
       const startButton = document.querySelector("#start-button");
       const cell = 16;
       const cells = canvas.width / cell;
-      const tickMs = 115;
+      const initialTickMs = 220;
+      const speedupPerFoodMs = 12;
+      const minimumTickMs = 70;
       let snake;
       let food;
       let direction;
@@ -234,6 +236,14 @@
       let state = "ready";
 
       bestLabel.textContent = best;
+
+      function getTickMs() {
+        const foodEaten = score / 10;
+        return Math.max(
+          minimumTickMs,
+          initialTickMs - foodEaten * speedupPerFoodMs
+        );
+      }
 
       function loadBest() {
         try {
@@ -307,7 +317,7 @@
         overlay.hidden = true;
         startButton.textContent = "PAUSE";
         clearInterval(timer);
-        timer = setInterval(step, tickMs);
+        timer = setInterval(step, getTickMs());
       }
 
       function pause() {
@@ -363,6 +373,8 @@
             endGame(true);
             return;
           }
+          clearInterval(timer);
+          timer = setInterval(step, getTickMs());
         } else {
           snake.pop();
         }
